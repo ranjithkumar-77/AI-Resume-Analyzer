@@ -21,20 +21,20 @@ AI Resume Analyzer is a Spring Boot web application that analyzes resumes based 
 - Job Recommendations
 - Admin Dashboard
 - Recruiter Dashboard
-
 ## 🛠 Technologies Used
 - Java
 - Spring Boot
 - Spring MVC
 - Spring Data JPA
 - Hibernate
-- H2 Database
+- MySQL
 - HTML
 - CSS
 - JavaScript
 - Bootstrap
 - Maven
-- Git & GitHub
+- Git
+- GitHub
 
 ## 🚀 How to Run
 1. Clone the repository.
