@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Panel | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav-bar">
+    <div class="nav-brand">
+        <span class="brand-title">AI Resume Analyzer</span>
+        <span class="brand-tag">Recruiter Panel</span>
+    </div>
+
+    <div class="nav-actions">
+        <a href="dashboard.html" class="button button-outline">Dashboard</a>
+        <a href="admin.html" class="button button-secondary">Admin</a>
+        <a href="index.html" class="button button-primary">Home</a>
+    </div>
+</nav>
+
+<main class="content">
+
+<section class="section">
+
+<div class="section-header">
+    <h2>Recruiter Dashboard</h2>
+    <p>Upload a Job Description and rank resumes.</p>
+</div>
+
+<!-- Upload JD -->
+<div class="card">
+
+<h3>Upload Job Description</h3>
+
+<div class="form-group">
+<label>Job Title</label>
+<input type="text" id="jobTitle" placeholder="Java Full Stack Developer">
+</div>
+
+<div class="form-group">
+<label>Job Description</label>
+<textarea id="jobDesc" rows="8"
+placeholder="Paste complete Job Description here..."></textarea>
+</div>
+
+<div class="button-group">
+<button class="button button-primary" onclick="uploadJD()">
+Upload JD
+</button>
+</div>
+
+</div>
+
+<!-- Recent JDs -->
+<div class="card" style="margin-top:25px;">
+
+<h3>Recent Job Descriptions</h3>
+
+<div id="recentJDs">
+Loading...
+</div>
+
+</div>
+
+<!-- Candidate Ranking -->
+<div class="card" style="margin-top:25px;">
+
+<h3>Candidate Ranking</h3>
+
+<div id="candidateRanking">
+
+<p>No ranking available.</p>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<footer class="footer">
+<p>AI Resume Analyzer - Recruiter Panel</p>
+</footer>
+
+<script>
+
+window.onload = function(){
+
+    loadRecentJDs();
+
+};
+
+// ================= Upload JD =================
+
+async function uploadJD(){
+
+    const title = document.getElementById("jobTitle").value;
+
+    const description = document.getElementById("jobDesc").value;
+
+    if(description.trim()===""){
+
+        alert("Please enter Job Description");
+
+        return;
+
+    }
+
+    const response = await fetch("/api/recruiter/job-description",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            title:title,
+
+            description:description
+
+        })
+
+    });
+
+    if(!response.ok){
+
+        alert("Upload Failed");
+
+        return;
+
+    }
+
+    const ranked = await response.json();
+
+    renderRankedCandidates(ranked);
+
+    loadRecentJDs();
+
+    alert("Job Description Uploaded Successfully");
+
+}
+
+// ================= Recent JD =================
+
+async function loadRecentJDs(){
+
+    const response = await fetch("/api/recruiter/job-description");
+
+    const data = await response.json();
+
+    let html="";
+
+    if(data.length===0){
+
+        html="<p>No Job Descriptions Uploaded.</p>";
+
+    }
+    else{
+
+        html="<table class='table'>";
+
+        html+="<thead>";
+
+        html+="<tr>";
+
+        html+="<th>No</th>";
+
+        html+="<th>Job Title</th>";
+
+        html+="<th>Description</th>";
+
+        html+="<th>Action</th>";
+
+        html+="</tr>";
+
+        html+="</thead>";
+
+        html+="<tbody>";
+
+        data.forEach((jd,index)=>{
+
+            html+=`
+            <tr>
+
+            <td>${index+1}</td>
+
+            <td>${jd.title}</td>
+
+            <td>${jd.description.substring(0,80)}...</td>
+
+            <td>
+                <button class="button button-outline" style="min-height:30px; padding:6px 12px; font-size:0.85rem;" onclick="rankExisting(${jd.id})">
+                    Rank Candidates
+                </button>
+            </td>
+
+            </tr>
+            `;
+
+        });
+
+        html+="</tbody></table>";
+
+    }
+
+    document.getElementById("recentJDs").innerHTML=html;
+
+}
+
+// ================= Rank Existing JD =================
+
+async function rankExisting(id) {
+    try {
+        const response = await fetch(`/api/recruiter/job-description/${id}/rank`);
+        if (!response.ok) {
+            alert("Failed to rank candidates");
+            return;
+        }
+        const ranked = await response.json();
+        renderRankedCandidates(ranked);
+        alert("Candidates Ranked Successfully");
+    } catch(e) {
+        console.error(e);
+        alert("Error connecting to server to rank candidates");
+    }
+}
+
+// ================= Candidate Ranking =================
+
+function renderRankedCandidates(list){
+
+    let html="";
+
+    if(list.length===0){
+
+        html="<p>No Matching Candidates Found.</p>";
+
+    }
+
+    else{
+
+        html="<table class='table'>";
+
+        html+="<thead>";
+
+        html+="<tr>";
+
+        html+="<th>No</th>";
+
+        html+="<th>Name</th>";
+
+        html+="<th>Email</th>";
+
+        html+="<th>Match</th>";
+
+        html+="<th>ATS</th>";
+
+        html+="</tr>";
+
+        html+="</thead>";
+
+        html+="<tbody>";
+
+        list.forEach((candidate,index)=>{
+
+            html+=`
+
+            <tr>
+
+            <td>${index+1}</td>
+
+            <td>${candidate.name??"-"}</td>
+
+            <td>${candidate.email??"-"}</td>
+
+            <td>${candidate.matchScore??"-"}</td>
+
+            <td>${candidate.atsScore??"-"}</td>
+
+            </tr>
+
+            `;
+
+        });
+
+        html+="</tbody>";
+
+        html+="</table>";
+
+    }
+
+    document.getElementById("candidateRanking").innerHTML=html;
+
+}
+
+</script>
+
+</body>
+</html>

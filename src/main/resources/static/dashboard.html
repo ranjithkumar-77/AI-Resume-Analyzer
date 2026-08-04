@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<script>
+if (!localStorage.getItem("userEmail")) {
+    alert("Please login first.");
+    window.location.href = "index.html";
+}
+</script>
+
+<nav class="nav-bar">
+    <div class="nav-brand">
+        <span class="brand-title">AI Resume Analyzer</span>
+        <span class="brand-tag">Dashboard and resume insights</span>
+    </div>
+    <div class="nav-actions">
+        <a href="history.html" class="button button-secondary">History</a>
+        <a href="recruiter.html" class="button button-outline">Recruiter</a>
+        <a href="admin.html" class="button button-outline">Admin</a>
+        <button class="button button-outline" onclick="logout()">Logout</button>
+    </div>
+</nav>
+
+<header class="dashboard-header">
+    <div>
+        <h1>Welcome Back</h1>
+        <p>Hi <strong id="userName"></strong>, here is your resume performance summary.</p>
+    </div>
+    <div class="header-actions">
+        <button class="button button-secondary" onclick="window.location.href='history.html'">View History</button>
+        <button class="button button-outline" onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<div id="loading" class="loading-overlay" style="display:none;">
+    <div class="loading-card">
+        <div id="loadingText">Preparing upload...</div>
+        <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+    </div>
+</div>
+
+<main class="dashboard-grid">
+    <section class="stats-panel">
+        <div class="stats">
+            <div class="card stat-card">
+                <h3>Total Resumes</h3>
+                <p id="total">0</p>
+            </div>
+            <div class="card stat-card">
+                <h3>Highest ATS</h3>
+                <p id="highest">0</p>
+            </div>
+            <div class="card stat-card">
+                <h3>Average ATS</h3>
+                <p id="average">0</p>
+            </div>
+        </div>
+        <div class="card chart-card">
+            <h2>ATS Score Trend</h2>
+            <canvas id="atsChart" height="140"></canvas>
+        </div>
+    <div class="card">
+        <h2>Upload Resume</h2>
+        <div class="form-group">
+            <label>Select Resume</label>
+            <input type="file" id="resumeFile" accept=".pdf,.doc,.docx">
+        </div>
+        <div class="form-group">
+            <label>Paste Job Description</label>
+            <textarea id="jobDescription" rows="6" placeholder="Paste Job Description Here..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Select Company (optional)</label>
+            <select id="companySelect">
+                <option value="">-- None --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Select Resume Template</label>
+            <div class="template-container">
+                <div class="template-card active" onclick="selectTemplate(this,'modern')">
+                    <img src="images/modern.png" class="template-img" alt="Modern resume template">
+                    <h4>Modern</h4>
+                </div>
+                <div class="template-card" onclick="selectTemplate(this,'classic')">
+                    <img src="images/classic.png" class="template-img" alt="Classic resume template">
+                    <h4>Classic</h4>
+                </div>
+                <div class="template-card" onclick="selectTemplate(this,'executive')">
+                    <img src="images/executive.png" class="template-img" alt="Executive resume template">
+                    <h4>Executive</h4>
+                </div>
+            </div>
+            <div class="selected-template-label">
+                Selected template: <strong id="selectedTemplate">Modern</strong>
+            </div>
+        </div>
+        <input type="hidden" id="template" value="modern">
+        <button class="button button-primary" onclick="analyzeResume()">Analyze Resume</button>
+    </div>
+</section>
+
+<section class="analysis-panel" style="display:none;">
+    <div id="result" class="card result">
+        <h2>Resume Analysis</h2>
+        <div class="result-stats">
+            <div>
+                <h3>ATS Score</h3>
+                <p id="atsScore">0</p>
+            </div>
+            <div>
+                <h3>Match Score</h3>
+                <p id="matchScore">0%</p>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="card mini-card">
+                <h4>Skills Found</h4>
+                <p id="skillsFound">0</p>
+            </div>
+            <div class="card mini-card">
+                <h4>Missing Skills</h4>
+                <p id="missingSkills">0</p>
+            </div>
+        </div>
+        <div class="card summary-card">
+            <h3>Recommended Jobs</h3>
+            <div id="recommendedJobs">No Jobs</div>
+        </div>
+        <div class="card summary-card">
+            <h3>Recommended Courses</h3>
+            <div id="recommendedCourses">No Courses</div>
+        </div>
+        <div class="section-block">
+            <h3>AI Suggestions</h3>
+            <pre id="analysis"></pre>
+        </div>
+        <div class="section-block">
+            <h3>ATS Optimized Resume</h3>
+            <pre id="improvedResume"></pre>
+        </div>
+        <div class="button-group">
+            <button class="button button-outline" onclick="copyResume()">Copy Resume</button>
+            <button class="button button-secondary" onclick="downloadResume(currentResumeId)">Download Resume PDF</button>
+            <button class="button button-outline" onclick="downloadAnalysisReport(currentResumeId)">Download ATS Report</button>
+        </div>
+    </div>
+</section>
+</main>
+
+<section class="history-panel">
+    <div class="card history-card">
+        <div class="history-header">
+            <h2>Resume History</h2>
+            <p>Track every upload, see ATS scores, and download reports anytime.</p>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Resume File</th>
+                        <th>ATS Score</th>
+                        <th>Match Score</th>
+                        <th>Download</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <p>AI Resume Analyzer | Manage uploads, track your ATS performance, and improve your resume for every job.</p>
+</footer>
+
+<script>
+const storedName = localStorage.getItem("userName") || localStorage.getItem("userEmail");
+document.getElementById("userName").textContent = storedName;
+function logout(){
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
+    alert("Logout Successful");
+    window.location.href="index.html";
+}
+</script>
+
+<script src="dashboard.js"></script>
+
+</body>
+</html>

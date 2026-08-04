@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | AI Resume Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav-bar">
+    <div class="nav-brand">
+        <span class="brand-title">AI Resume Analyzer</span>
+        <span class="brand-tag">Admin Panel</span>
+    </div>
+    <div class="nav-actions">
+        <a href="dashboard.html" class="button button-outline">Dashboard</a>
+        <a href="recruiter.html" class="button button-secondary">Recruiter</a>
+        <a href="index.html" class="button button-primary">Home</a>
+    </div>
+</nav>
+
+<main class="content">
+    <section class="section">
+        <div class="section-header">
+            <h2>Admin Dashboard</h2>
+            <p>Manage users, job roles, skills and view reports.</p>
+        </div>
+
+        <div class="stats" style="margin-bottom: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px;">
+            <div class="card stat-card" style="text-align: center; padding: 15px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h4 style="color: #666; margin-bottom: 5px;">Total Users</h4>
+                <p id="statTotalUsers" style="font-size: 24px; font-weight: bold; color: #1565c0; margin: 0;">0</p>
+            </div>
+            <div class="card stat-card" style="text-align: center; padding: 15px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h4 style="color: #666; margin-bottom: 5px;">Total Resumes</h4>
+                <p id="statTotalResumes" style="font-size: 24px; font-weight: bold; color: #1565c0; margin: 0;">0</p>
+            </div>
+            <div class="card stat-card" style="text-align: center; padding: 15px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h4 style="color: #666; margin-bottom: 5px;">Job Descriptions</h4>
+                <p id="statTotalJDs" style="font-size: 24px; font-weight: bold; color: #1565c0; margin: 0;">0</p>
+            </div>
+            <div class="card stat-card" style="text-align: center; padding: 15px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h4 style="color: #666; margin-bottom: 5px;">Highest ATS</h4>
+                <p id="statHighestATS" style="font-size: 24px; font-weight: bold; color: #1565c0; margin: 0;">0</p>
+            </div>
+            <div class="card stat-card" style="text-align: center; padding: 15px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h4 style="color: #666; margin-bottom: 5px;">Average ATS</h4>
+                <p id="statAverageATS" style="font-size: 24px; font-weight: bold; color: #1565c0; margin: 0;">0</p>
+            </div>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Users</h3>
+                <div id="usersListContainer" style="margin-top:10px; max-height:240px; overflow:auto;">Loading users...</div>
+            </div>
+            <div class="feature-card">
+                <h3>Job Roles</h3>
+                <p>Add, edit or remove job roles and their skill lists.</p>
+                <div style="margin-top:10px;">
+                    <input type="text" id="newRoleName" placeholder="Role name" style="width:60%;" />
+                    <input type="text" id="newRoleSkills" placeholder="Comma separated skills" style="width:35%;" />
+                    <button class="button button-primary" onclick="addRole()">Add / Update</button>
+                </div>
+                <div id="rolesList" style="margin-top:10px; max-height:240px; overflow:auto;">Loading roles...</div>
+            </div>
+            <div class="feature-card">
+                <h3>Reports</h3>
+                <p>Download system reports and analytics.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Recruiters</h3>
+                <p>Manage recruiter accounts and uploaded job descriptions.</p>
+            </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:20px; align-items:flex-start;">
+            <div style="flex:1;">
+                <h3>Company ATS Rules</h3>
+                <div style="margin-top:10px;">
+                    <input type="text" id="companyKey" placeholder="Company key (e.g., amazon)" style="width:45%;" />
+                    <input type="text" id="companyRules" placeholder="Comma separated rules/keywords" style="width:45%;" />
+                    <button class="button button-primary" onclick="addCompany()">Add / Update</button>
+                </div>
+                <div id="companyList" style="margin-top:10px; max-height:240px; overflow:auto;">Loading companies...</div>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<footer class="footer">
+    <p>Admin Panel — AI Resume Analyzer</p>
+</footer>
+
+<script>
+    async function loadRoles(){
+        try{
+            const resp = await fetch('/api/admin/job-roles');
+            const data = await resp.json();
+            const container = document.getElementById('rolesList');
+            container.innerHTML = '';
+            for (const [role, skills] of Object.entries(data)){
+                const div = document.createElement('div');
+                div.style.padding = '6px 0';
+                div.innerHTML = `<strong>${role}</strong>: ${skills.join(', ')}`;
+                container.appendChild(div);
+            }
+        }catch(e){
+            console.error(e);
+            document.getElementById('rolesList').innerText = 'Failed to load roles.';
+        }
+    }
+
+    async function addRole(){
+        const roleName = document.getElementById('newRoleName').value || '';
+        const skillsText = document.getElementById('newRoleSkills').value || '';
+        if (!roleName.trim()) { alert('Role name required'); return; }
+        const skills = skillsText.split(',').map(s=>s.trim()).filter(s=>s);
+        try{
+            const resp = await fetch('/api/admin/job-roles', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ roleName: roleName, skills: skills })
+            });
+            if (resp.ok) {
+                document.getElementById('newRoleName').value = '';
+                document.getElementById('newRoleSkills').value = '';
+                loadRoles();
+                alert('Role saved');
+            } else {
+                const txt = await resp.text();
+                alert('Error: ' + txt);
+            }
+        }catch(e){
+            console.error(e);
+            alert('Failed to save role');
+        }
+    }
+
+    // Load on page ready
+    window.addEventListener('DOMContentLoaded', function(){ loadRoles(); loadCompanies(); loadUsers(); loadStats(); });
+
+    async function loadUsers(){
+        try{
+            const resp = await fetch('/api/admin/users');
+            const data = await resp.json();
+            const container = document.getElementById('usersListContainer');
+            container.innerHTML = '';
+            if (data.length === 0) {
+                container.innerHTML = '<div>No registered users found.</div>';
+                return;
+            }
+            data.forEach(u => {
+                const div = document.createElement('div');
+                div.style.padding = '6px 0';
+                div.style.borderBottom = '1px solid #eee';
+                div.innerHTML = `<strong>${u.name}</strong> (${u.email})`;
+                container.appendChild(div);
+            });
+        }catch(e){
+            console.error(e);
+            document.getElementById('usersListContainer').innerText = 'Failed to load users.';
+        }
+    }
+
+    async function loadStats(){
+        try{
+            const resp = await fetch('/api/admin/stats');
+            const data = await resp.json();
+            document.getElementById('statTotalUsers').innerText = data.totalUsers;
+            document.getElementById('statTotalResumes').innerText = data.totalResumes;
+            document.getElementById('statTotalJDs').innerText = data.totalJobDescriptions;
+            document.getElementById('statHighestATS').innerText = data.highestATS;
+            document.getElementById('statAverageATS').innerText = data.averageATS;
+        }catch(e){
+            console.error(e);
+        }
+    }
+
+    async function loadCompanies(){
+        try{
+            const resp = await fetch('/api/companies');
+            const data = await resp.json();
+            const container = document.getElementById('companyList');
+            container.innerHTML = '';
+            for (const [key, rules] of Object.entries(data)){
+                const div = document.createElement('div');
+                div.style.padding = '6px 0';
+                div.innerHTML = `<strong>${key}</strong>: ${rules.join(', ')}`;
+                container.appendChild(div);
+            }
+        }catch(e){
+            console.error(e);
+            document.getElementById('companyList').innerText = 'Failed to load companies.';
+        }
+    }
+
+    async function addCompany(){
+        const key = document.getElementById('companyKey').value || '';
+        const rulesText = document.getElementById('companyRules').value || '';
+        if (!key.trim()) { alert('Company key required'); return; }
+        const rules = rulesText.split(',').map(s=>s.trim()).filter(s=>s);
+        try{
+            const resp = await fetch('/api/companies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: key, rules: rules })
+            });
+            if (resp.ok) {
+                document.getElementById('companyKey').value = '';
+                document.getElementById('companyRules').value = '';
+                loadCompanies();
+                alert('Company saved');
+            } else {
+                const txt = await resp.text();
+                alert('Error: ' + txt);
+            }
+        }catch(e){
+            console.error(e);
+            alert('Failed to save company');
+        }
+    }
+</script>
+
+</body>
+</html>

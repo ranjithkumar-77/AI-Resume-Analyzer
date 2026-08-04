@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Login | AI Resume Analyzer</title>
+   <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav-bar">
+    <div class="nav-brand">
+        <span class="brand-title">AI Resume Analyzer</span>
+        <span class="brand-tag">Sign in to manage your resumes</span>
+    </div>
+    <div class="nav-actions">
+        <a href="index.html" class="button button-outline">Home</a>
+        <a href="register.html" class="button button-secondary">Register</a>
+        <a href="recruiter.html" class="button button-outline">Recruiter</a>
+        <a href="admin.html" class="button button-outline">Admin</a>
+    </div>
+</nav>
+
+<div class="auth-page">
+   <div class="auth-content">
+       <div class="auth-card">
+           <h1>Welcome Back</h1>
+           <p>Sign in to continue analyzing resumes and accessing your professional dashboard.</p>
+           <input type="email" id="email" placeholder="Email">
+           <input type="password" id="password" placeholder="Password">
+           <button class="button button-primary" onclick="login()">Login</button>
+           <div id="authFeedback" class="auth-feedback"></div>
+           <p class="small-text">
+               Don't have an account? <a href="register.html">Register</a><br>
+               <a href="forgot-password.html">Forgot password?</a>
+           </p>
+       </div>
+   </div>
+</div>
+
+<script src="auth.js"></script>
+
+</body>
+</html>

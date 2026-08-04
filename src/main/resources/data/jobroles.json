@@ -1,0 +1,176 @@
+{
+  "Java Full Stack Developer": [
+    "java",
+    "spring",
+    "spring boot",
+    "hibernate",
+    "mysql",
+    "rest api",
+    "git",
+    "github",
+    "html",
+    "css",
+    "javascript"
+  ],
+
+  "Frontend Developer": [
+    "html",
+    "css",
+    "javascript",
+    "react",
+    "angular",
+    "bootstrap",
+    "tailwind",
+    "typescript"
+  ],
+
+  "Backend Developer": [
+    "java",
+    "spring boot",
+    "hibernate",
+    "mysql",
+    "postgresql",
+    "mongodb",
+    "rest api",
+    "microservices",
+    "docker"
+  ],
+
+  "Python Developer": [
+    "python",
+    "django",
+    "flask",
+    "fastapi",
+    "mysql",
+    "postgresql",
+    "git",
+    "rest api"
+  ],
+
+  "Data Scientist": [
+    "python",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "scikit-learn",
+    "tensorflow",
+    "keras",
+    "machine learning",
+    "deep learning",
+    "statistics",
+    "sql",
+    "power bi",
+    "excel"
+  ],
+
+  "AI Engineer": [
+    "python",
+    "tensorflow",
+    "keras",
+    "pytorch",
+    "transformers",
+    "llm",
+    "langchain",
+    "openai",
+    "huggingface",
+    "machine learning",
+    "deep learning",
+    "docker"
+  ],
+
+  "Machine Learning Engineer": [
+    "python",
+    "machine learning",
+    "scikit-learn",
+    "tensorflow",
+    "keras",
+    "xgboost",
+    "numpy",
+    "pandas"
+  ],
+
+  "DevOps Engineer": [
+    "linux",
+    "docker",
+    "kubernetes",
+    "jenkins",
+    "aws",
+    "azure",
+    "terraform",
+    "ansible",
+    "git",
+    "github",
+    "ci/cd"
+  ],
+
+  "Cloud Engineer": [
+    "aws",
+    "azure",
+    "gcp",
+    "docker",
+    "kubernetes",
+    "terraform",
+    "linux"
+  ],
+
+  "Cyber Security": [
+    "network security",
+    "ethical hacking",
+    "penetration testing",
+    "kali linux",
+    "wireshark",
+    "burp suite",
+    "owasp",
+    "linux"
+  ],
+
+  "QA Engineer": [
+    "selenium",
+    "manual testing",
+    "automation testing",
+    "testng",
+    "junit",
+    "postman",
+    "api testing",
+    "jira"
+  ],
+
+  "Android Developer": [
+    "java",
+    "kotlin",
+    "android",
+    "firebase",
+    "xml",
+    "room database"
+  ],
+
+  "Flutter Developer": [
+    "flutter",
+    "dart",
+    "firebase",
+    "rest api",
+    "android",
+    "ios"
+  ],
+
+  "UI UX Designer": [
+    "figma",
+    "adobe xd",
+    "photoshop",
+    "wireframe",
+    "prototype",
+    "ui",
+    "ux"
+  ],
+
+  "Data Analyst": [
+    "sql",
+    "excel",
+    "power bi",
+    "tableau",
+    "python",
+    "pandas",
+    "statistics"
+  ]
+}

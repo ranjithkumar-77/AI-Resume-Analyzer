@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="UTF-8">
+<title>ATS Resume Analyzer</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    background:#eef2f7;
+    margin:30px;
+}
+
+.container{
+    width:1000px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 0 15px rgba(0,0,0,.15);
+}
+
+h1{
+    text-align:center;
+    color:#1565C0;
+}
+
+label{
+    font-weight:bold;
+}
+
+select,
+textarea{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    margin-bottom:15px;
+    border-radius:5px;
+    border:1px solid #ccc;
+    font-size:14px;
+}
+
+textarea{
+    height:250px;
+    resize:vertical;
+}
+
+button{
+    background:#1565C0;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:15px;
+}
+
+button:hover{
+    background:#0D47A1;
+}
+
+.dashboard{
+    margin-top:30px;
+}
+
+.score-card{
+    text-align:center;
+    background:#1565C0;
+    color:white;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+.score{
+    font-size:45px;
+    font-weight:bold;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+table th,
+table td{
+    border:1px solid #ddd;
+    padding:10px;
+}
+
+table th{
+    background:#1565C0;
+    color:white;
+}
+
+.good{
+    color:green;
+    font-weight:bold;
+}
+
+.bad{
+    color:red;
+    font-weight:bold;
+}
+
+ul{
+    padding-left:20px;
+}
+
+.recommendation{
+    background:#f5f5f5;
+    padding:15px;
+    border-left:5px solid #1565C0;
+    margin-top:20px;
+}
+
+.highlight-box{
+    border:1px solid #ccc;
+    background:#fafafa;
+    padding:15px;
+    border-radius:8px;
+    white-space:pre-wrap;
+    line-height:1.8;
+    margin-top:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>ATS Resume Analyzer</h1>
+<form
+th:action="@{/match}"
+method="post"
+enctype="multipart/form-data">
+
+<label>Select Job</label>
+
+<select name="jobId" required>
+
+<option value="">Choose Job</option>
+
+<option
+th:each="job : ${jobs}"
+th:value="${job.id}"
+th:text="${job.title}">
+</option>
+
+</select>
+
+<label>Upload Resume (PDF/DOCX)</label>
+
+<input
+type="file"
+name="resumeFile"
+accept=".pdf,.doc,.docx"
+required
+style="width:100%;
+padding:12px;
+margin-top:8px;
+margin-bottom:20px;
+border:1px solid #ccc;
+border-radius:5px;">
+
+<button type="submit">
+Analyze Resume
+</button>
+
+</form>
+
+<div class="dashboard" th:if="${result!=null}">
+
+<div class="score-card">
+
+<h2>Overall ATS Score</h2>
+
+<div class="score"
+th:text="${result.matchPercentage+'%'}">
+</div>
+
+</div>
+
+<table>
+
+<tr>
+<th>Category</th>
+<th>Score</th>
+</tr>
+
+<tr>
+<td>Skills</td>
+<td th:text="${result.skillScore+'%'}"></td>
+</tr>
+
+<tr>
+<td>Education</td>
+<td th:text="${result.educationScore+'%'}"></td>
+</tr>
+
+<tr>
+<td>Experience</td>
+<td th:text="${result.experienceScore+'%'}"></td>
+</tr>
+
+<tr>
+<td>Projects</td>
+<td th:text="${result.projectScore+'%'}"></td>
+</tr>
+
+<tr>
+<td>Formatting</td>
+<td th:text="${result.formattingScore+'%'}"></td>
+</tr>
+
+</table>
+
+<h2>Matched Skills</h2>
+
+<ul>
+
+<li class="good"
+th:each="skill : ${result.matchedSkills}"
+th:text="${skill}">
+</li>
+
+</ul>
+
+<h2>Missing Skills</h2>
+
+<ul>
+
+<li class="bad"
+th:each="skill : ${result.missingSkills}"
+th:text="${skill}">
+</li>
+
+</ul>
+
+<div class="recommendation">
+
+<h3>Recommendation</h3>
+
+<p th:text="${result.recommendation}"></p>
+
+</div>
+
+<hr>
+
+<h2 style="color:#1565C0;">
+AI Resume Improvement Suggestions
+</h2>
+
+<div th:if="${result.suggestions!=null}">
+
+<div
+th:each="s : ${result.suggestions}"
+style="background:#f8f9fa;
+border-left:5px solid #1565C0;
+padding:12px;
+margin-bottom:12px;
+border-radius:6px;">
+
+<h4
+style="margin:0;color:#1565C0;"
+th:text="${s.title}">
+</h4>
+
+<p
+style="margin-top:6px;"
+th:text="${s.description}">
+</p>
+
+</div>
+
+</div>
+
+<hr>
+
+<h2 style="color:#1565C0;">
+Highlighted Resume
+</h2>
+
+<div class="highlight-box"
+th:utext="${result.highlightedResume}">
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
